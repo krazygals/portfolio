@@ -1,0 +1,20 @@
+---
+// src/components/Projects.astro
+import ProjectCard from "./ProjectCard.astro"
+import type { Project } from "../data/projects"
+import { projects } from "../data/projects"
+
+export interface Props {
+  category?: "work" | "school" | "all"
+  variant?: "full" | "title"
+}
+
+const { category = "all", variant = "full" } = Astro.props
+const filtered: Project[] = projects.filter(p => category === "all" ? true : p.category === category)
+---
+
+<section class={variant === "title" ? "" : "grid gap-6 md:grid-cols-2 lg:grid-cols-3"}>
+  {filtered.map((p) => (
+    <ProjectCard project={p} variant={variant} />
+  ))}
+</section>

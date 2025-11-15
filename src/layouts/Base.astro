@@ -1,0 +1,146 @@
+---
+const {
+  title = "Oriana Olmstead — Portfolio",
+  description = "AI + Data • Creative automation",
+} = Astro.props;
+---
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <link rel="stylesheet" href="/src/index.css" />
+    <style>
+      /* Inline so we don't depend on external CSS for the layer */
+      .fx-bg{position:fixed;inset:0;pointer-events:none;z-index:1}
+      .fx-bg canvas{width:100vw;height:100vh;display:block}
+      main, footer{position:relative;z-index:2}
+    </style>
+  </head>
+
+  <body class="min-h-screen">
+    <!-- background pixel field -->
+    <div class="fx-bg"><canvas id="bg-pixels"></canvas></div>
+
+    <!-- content above pixels -->
+    <main class="container-page">
+      <slot />
+    </main>
+
+    <footer class="red-skin border-t ink-rule py-10 text-center">
+      <p class="text-sm opacity-80">© {new Date().getFullYear()} Oriana Olmstead - All rights reserved.</p>
+    </footer>
+
+    <script is:inline>
+    (() => {
+    // Prevent duplicates during HMR
+    if (window.__bgPixelsRunning) return;
+    window.__bgPixelsRunning = true;
+
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const canvas = document.getElementById('bg-pixels');
+    if (!canvas || reduce) return;
+    const ctx = canvas.getContext('2d', { alpha: true });
+
+    // Viewport sizing
+    let DPR = Math.max(1, devicePixelRatio || 1);
+    let W = 0, H = 0;
+    function resize() {
+        DPR = Math.max(1, devicePixelRatio || 1);
+        W = Math.floor(innerWidth * DPR);
+        H = Math.floor(innerHeight * DPR);
+        canvas.width = W;
+        canvas.height = H;
+    }
+    resize(); addEventListener('resize', resize);
+
+    // Config (calm defaults)
+    const isCoarse = matchMedia('(pointer: coarse)').matches;
+    const COUNT = isCoarse ? 70 : 130;
+    const SIZE_MIN = 1.0, SIZE_MAX = 2.0;      // CSS px (× DPR below)
+    const RADIUS = isCoarse ? 90 : 110;        // repel radius in CSS px
+    const SPRING = 0.025;                      // home spring
+    const DAMPING = 0.92;                      // friction
+    const REPEL_FORCE = 900;                   // repel strength
+    const MAX_ACCEL = 1.2;                     // per-frame accel clamp (already DPR space)
+    const MAX_SPEED = 45 * DPR;                // velocity clamp
+    const OUT_MARGIN = 40 * DPR;               // how far offscreen a dot is allowed
+    const OUT_BOOST = 3.5;                     // stronger spring when offscreen
+
+    const COLORS = [
+        'rgba(139,92,246,0.95)',  // purple
+        'rgba(167,139,250,0.85)', // light purple
+        'rgba(99,102,241,0.75)',  // indigo
+        'rgba(104, 47, 165, 0.55)',  // mint
+    ];
+
+    // Particles
+    const dots = [];
+    function rand(a,b){ return a + Math.random()*(b-a); }
+    for (let i=0;i<COUNT;i++){
+        const x = Math.random()*W, y = Math.random()*H;
+        const s = rand(SIZE_MIN, SIZE_MAX)*DPR;
+        dots.push({ x, y, vx:0, vy:0, hx:x, hy:y, s, c: COLORS[(Math.random()*COLORS.length)|0] });
+    }
+
+    // Pointer in canvas coords
+    let pointer = null;
+    const setPointer = (e)=>{ pointer = { x: e.clientX*DPR, y: e.clientY*DPR }; };
+    addEventListener('pointermove', setPointer, { passive:true });
+    addEventListener('pointerdown', setPointer, { passive:true });
+    addEventListener('pointerleave', ()=>{ pointer = null; }, { passive:true });
+    addEventListener('pointercancel', ()=>{ pointer = null; }, { passive:true });
+
+    const R2 = (RADIUS * DPR) ** 2;
+
+    function step(){
+        ctx.clearRect(0,0,W,H);
+
+        for (const p of dots){
+        // If the dot is offscreen beyond a margin, increase the spring so it returns
+        const offX = (p.x < -OUT_MARGIN) || (p.x > W + OUT_MARGIN);
+        const offY = (p.y < -OUT_MARGIN) || (p.y > H + OUT_MARGIN);
+        const k = (offX || offY) ? SPRING * OUT_BOOST : SPRING;
+
+        // base spring toward home
+        let ax = (p.hx - p.x) * k;
+        let ay = (p.hy - p.y) * k;
+
+        // repel near pointer (no wrap; standard Euclidean)
+        if (pointer){
+            const dx = p.x - pointer.x, dy = p.y - pointer.y;
+            const r2 = dx*dx + dy*dy;
+            if (r2 < R2 && r2 > 1){
+            const invr = 1/Math.sqrt(r2);
+            const f = (REPEL_FORCE * DPR)/r2;
+            ax += dx*invr*f; ay += dy*invr*f;
+            }
+        }
+
+        // Calm: clamp accel & speed
+        ax = Math.max(-MAX_ACCEL, Math.min(MAX_ACCEL, ax));
+        ay = Math.max(-MAX_ACCEL, Math.min(MAX_ACCEL, ay));
+
+        p.vx = (p.vx + ax) * DAMPING;
+        p.vy = (p.vy + ay) * DAMPING;
+
+        const vm = Math.hypot(p.vx, p.vy);
+        if (vm > MAX_SPEED){ p.vx *= MAX_SPEED/vm; p.vy *= MAX_SPEED/vm; }
+
+        // integrate (NO WRAP)
+        p.x += p.vx;
+        p.y += p.vy;
+
+        // draw
+        ctx.fillStyle = p.c;
+        ctx.fillRect(p.x, p.y, p.s, p.s);
+        }
+
+        requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+    })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,176 @@
+---
+export interface Props {
+  eyebrow?: string;
+  title?: string;
+  location?: string;
+}
+const {
+  eyebrow = "Analytics + AI pipelines + Full-Stack Apps",
+  title = "AI + DATA SYSTEMS STRATEGIST",
+  location = "Coding globally from New Mexico."
+} = Astro.props;
+---
+
+<section class="full-bleed">
+  <div class="bg-transparent text-[var(--color-ink)]">
+
+    <!-- top band: logo / nav / hire me (boxed grid) -->
+    <div class="grid grid-cols-2 border-y ink-rule">
+      <div class="p-3 md:p-4 border-r ink-rule flex items-center font-semibold tracking-wide">
+            <a href="/" class="no-underline hover:underline hover:decoration-[var(--color-brand)] transition">
+            OO
+            </a>
+        </div>
+
+      <div class="p-3 md:p-4 border-r ink-rule flex items-center justify-center gap-8">
+        <a href="/about" class="no-underline hover:underline">About</a>
+        <a href="/work"  class="no-underline hover:underline">Work</a>
+        <a href="/contact" class="no-underline hover:underline">Contact</a>
+      </div>
+
+    </div>
+
+    <!-- binary ticker (seamless drift + flicker; velocity-sensitive) -->
+    <div class="px-6 md:px-8 border-b ink-rule">
+      <div class="ticker-viewport py-2" aria-hidden="true">
+        <div id="binary-track" class="binary-track"></div>
+      </div>
+    </div>
+
+    <script is:inline>
+    (() => {
+    const track = document.getElementById('binary-track');
+    if (!track) return;
+
+    // ---------- CONFIG ----------
+    const DIGITS_PER_CHUNK = 150;
+    const DIRECTION = 1;                // 1 = left→right, -1 = right→left
+    const BASE_SPEED = 25;              // px/s at rest
+    const MAX_SPEED  = 90;              // px/s cap
+    const MAX_MOUSE  = 1400;            // px/s → maps to MAX_SPEED
+
+    const FLICKER_INTERVAL_MS = 120;
+    const MIN_PORTION = 0.12;           // min % of digits flipped per tick
+    const MAX_PORTION = 0.35;           // max % when moving fast
+
+    // ---------- BUILD TWO IDENTICAL CHUNKS ----------
+    function buildChunkEl() {
+        const el = document.createElement('span');
+        el.className = 'chunk';
+        const frag = document.createDocumentFragment();
+        for (let i = 0; i < DIGITS_PER_CHUNK; i++) {
+        const s = document.createElement('span');
+        s.className = 'bit';
+        s.textContent = Math.random() < 0.5 ? '0' : '1';
+        frag.appendChild(s);
+        if (i !== DIGITS_PER_CHUNK - 1) frag.appendChild(document.createTextNode(' '));
+        }
+        el.appendChild(frag);
+        return el;
+    }
+
+    const chunkA = buildChunkEl();
+    const chunkB = chunkA.cloneNode(true);
+    track.appendChild(chunkA);
+    track.appendChild(chunkB);
+
+    const bitsA = [...chunkA.querySelectorAll('.bit')];
+    const bitsB = [...chunkB.querySelectorAll('.bit')];
+    const prefersReduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // ---------- mouse speed (use global if present; fallback local) ----------
+    let localSpeed = 0, lx = 0, ly = 0, lt = performance.now();
+    const smooth = 0.15;
+    const viewport = track.parentElement;
+
+    viewport.addEventListener('pointermove', (e) => {
+        const now = performance.now();
+        const dt = Math.max(1, now - lt) / 1000;
+        const dx = e.clientX - lx, dy = e.clientY - ly;
+        const inst = Math.hypot(dx, dy) / dt;
+        localSpeed = localSpeed + (inst - localSpeed) * smooth;
+        lx = e.clientX; ly = e.clientY; lt = now;
+    }, { passive: true });
+
+    const mouseSpeed = () =>
+        typeof window.__mouseSpeed === 'number' ? window.__mouseSpeed : localSpeed;
+
+    const curve = (ms) => { // techno S-curve 0..1
+        const x = Math.max(0, Math.min(1, ms / MAX_MOUSE));
+        return x*x*(3 - 2*x);
+    };
+
+    // ---------- FLICKER ----------
+    let flickerId = null;
+    function startFlicker() {
+        if (prefersReduce) return;
+        clearInterval(flickerId);
+        flickerId = setInterval(() => {
+        const k = curve(mouseSpeed());
+        const portion = MIN_PORTION + (MAX_PORTION - MIN_PORTION) * k;
+        const n = Math.max(1, Math.floor(bitsA.length * portion));
+        for (let i = 0; i < n; i++) {
+            const idx = (Math.random() * bitsA.length) | 0;
+            const val = Math.random() < 0.5 ? '0' : '1';
+            bitsA[idx].textContent = val;
+            bitsB[idx].textContent = val; // mirror for a seamless wrap
+        }
+        }, FLICKER_INTERVAL_MS);
+    }
+
+    // ---------- DRIFT (seamless modulo) ----------
+    let last = performance.now();
+    let t = 0;
+
+    const wA = () => chunkA.offsetWidth || chunkA.getBoundingClientRect().width || 1;
+
+    function raf(now) {
+        const dt = (now - last) / 1000; last = now;
+
+        if (!prefersReduce) {
+        const k = curve(mouseSpeed());
+        const speed = BASE_SPEED + (MAX_SPEED - BASE_SPEED) * k;
+
+        t += speed * dt;
+        const w = wA();
+
+        if (DIRECTION === 1) {
+            const x = (t % w) - w;             // keep in [-w, 0)
+            track.style.transform = `translate3d(${x}px,0,0)`;
+        } else {
+            const x = -(t % w);                // keep in [0, w)
+            track.style.transform = `translate3d(${x}px,0,0)`;
+        }
+        }
+        requestAnimationFrame(raf);
+    }
+
+    startFlicker();
+    requestAnimationFrame(raf);
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) clearInterval(flickerId);
+        else startFlicker();
+    });
+
+    let to;
+    window.addEventListener('resize', () => {
+        clearTimeout(to);
+        to = setTimeout(() => { last = performance.now(); }, 120);
+    });
+    })();
+    </script>
+    <!-- giant headline -->
+    <div class="px-6 md:px-8">
+      <div class="py-10 md:py-14">
+        <h1 class="uppercase font-[var(--font-display)] leading-[0.86] tracking-[.5px] text-[clamp(56px,10vw,172px)]">
+          {title}
+        </h1>
+      </div>
+
+      <div class="border-t ink-rule"></div>
+      <p class="text-center py-3 md:py-4 text-sm md:text-base opacity-90">{eyebrow}</p>
+      <div class="border-t ink-rule"></div>
+    </div>
+  </div>
+</section>

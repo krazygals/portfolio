@@ -1,0 +1,200 @@
+---
+import Base from "../layouts/Base.astro";
+import Hero from "../components/Hero.astro";
+
+const eyebrow = "A HOLISTIC PERSPECTIVE ON HUMANS AND DATA";
+const title = "Oriana Olmstead";
+const location = "Coding globally from New Mexico.";
+---
+
+<style>
+  /* anchor + sizing so tiles position relative to the portrait block */
+  .float-wrap { position: relative; display: inline-block; }
+  .float-tile { position: absolute; z-index: 30; width: 110px; height: 110px;
+    border-radius: 0.75rem; overflow: hidden; border: 1px solid rgba(255,255,255,.15);
+    box-shadow: 0 0 25px rgba(139,92,246,0.30);
+  }
+  /* t1 = top-left of the portrait (slightly offset outwards) */
+  .float-tile.t1 { top: -32px; left: -32px; }
+  /* t2 = bottom-right of the portrait (slightly offset outwards) */
+  .float-tile.t2 { bottom: -32px; right: -32px; }
+  .tile-img { width: 100%; height: 100%; object-fit: cover; display:block; }
+  @media (max-width: 768px){
+    .float-tile { width: 92px; height: 92px; }
+    .float-tile.t1 { top:-24px; left:-24px; }
+    .float-tile.t2 { bottom:-24px; right:-24px; }
+  }
+</style>
+
+<Base>
+  <Hero {eyebrow} {title} {location} />
+
+  <!-- ABOUT SECTION -->
+  <section class="full-bleed">
+    <div class="px-6 md:px-8 pt-16 md:pt-5">
+      <h2 data-react class="uppercase h1-condensed text-2xl tracking-[0.16em] opacity-80">About</h2>
+      <div class="border-t ink-rule my-4"></div>
+
+      <!-- 🖼️ Image + Bio Grid -->
+      <div class="grid md:grid-cols-2 gap-10 items-start mt-8 md:mt-12">
+       
+        <!-- LEFT: Portrait + floating tiles -->
+        <div class="flex justify-center">
+          <div id="about-floats" class="relative float-wrap select-none">
+
+            <!-- floating tiles, anchored to portrait corners -->
+            <div class="float-tile t1">
+
+              <img src="/images/tile-1.jpg" alt="floating tile" class="tile-img" />
+            </div>
+            <div class="float-tile t2" data-home="t2">
+              <img src="/images/tile-2.jpg" alt="floating tile" class="tile-img" />
+            </div>
+
+            <!-- main portrait (smaller) -->
+            <div class="relative group mt-20">
+              <div class="absolute inset-0 border ink-border rounded-2xl translate-x-[3px] translate-y-[3px] opacity-30 group-hover:translate-x-[5px] group-hover:translate-y-[5px] transition-transform duration-300"></div>
+              <img
+                src="/images/oriana-profile.jpg"
+                alt="Oriana Olmstead portrait"
+                class="rounded-2xl border ink-border w-[260px] md:w-[320px] relative z-10 shadow-[0_0_25px_rgba(139,92,246,0.25)]"
+              />
+            </div>
+          </div>
+        </div>
+        
+
+        <!-- RIGHT: Bio -->
+        <div class="prose prose-invert max-w-none opacity-90 space-y-4 text-sm md:text-base mx-0 px-0">
+
+          <p data-react>
+            I'm pursuing my Bachelor’s in Business Administration at the University of New Mexico, concentrating in Management Information Systems and Human Resources.
+            As a first-generation student, I left my hometown of Austin, Texas, because I'm committed to building a life that keeps me moving and learning.
+            Studying abroad in Amsterdam only cemented how much I value experiencing new cultures and perspectives.
+          </p>
+          <p data-react>
+            I’ve always had a passion for education, graduating high school with my Associates of Arts in Psychology, a certification that qualified me for my current job as a data analyst. 
+            Although my work is rooted in systems, what drives me is understanding the people behind the systems and finding creative ways to innovate. 
+          </p>
+          <p data-react>
+            When I’m not studying or developing projects, I’m usually planning a new nail set, a new trip, or practicing DJing. 
+            I think what makes me different from most developers and AI engineers is this creative side and my curiosity about human behavior. 
+            I see creativity and technology as symbiotic reflections of each other, both ways of expressing ideas, solving problems, and connecting with people.
+          </p>
+          <p data-react>
+            My goal isn’t just to build systems but to build spaces, tools, and experiences that feel alive and human.          
+            </p>
+        </div>
+      </div>
+
+      <div class="border-t ink-rule my-8"></div>
+
+      <!-- 🧾 CV SECTION -->
+      <section class="py-10 md:py-0.25 space-y-8">
+        <h2 data-react class="uppercase h1-condensed text-2xl tracking-[0.16em] opacity-80">Curriculum Vitae</h2>
+        <div class="border-t ink-rule my-4"></div>
+
+        <!-- SUMMARY -->
+        <div class="prose prose-invert max-w-none opacity-90 text-sm md:text-base space-y-3">
+          <p data-react>
+            Data Analyst & Full-Stack Developer with experience in AI automation, web application design, and data visualization. 
+            Skilled in Python, Flask, React, SQL, PostgreSQL, Excel, and AI frameworks including Claude, ChatGPT APIs, OCR, RAG, and vector databases.
+            Strong background in analytics, process optimization, and systems design supported by a foundation in psychology and business management. 
+            Known for combining technical precision with creative problem-solving to build intelligent, human-centered digital tools that make data more accessible and actionable          </p>
+        </div>
+
+        <!-- EXPERIENCE -->
+        <div class="border-t ink-rule my-8"></div>
+        <h3 class="uppercase h1-condensed text-xl tracking-[0.16em] opacity-80">Experience</h3>
+
+        <div class="space-y-6">
+          <div>
+            <div class="flex justify-between items-center">
+              <span class="font-semibold">Architecture Research Consultants</span>
+              <span class="text-xs opacity-70">2022 — Present</span>
+            </div>
+            <div class="eyebrow mt-1">AI & Data Analyst / Automation Lead</div>
+            <p class="mt-2 opacity-85 text-sm md:text-base">
+                - Led more than 10 district-wide utilization and capacity projects, coordinating with clients, contractors, and state agencies. <br />
+                - Reduced manual data entry hours by 63% by pioneering the shift from hard-copy Excel analysis to a dynamic SQL web-based platform. <br />
+                - Currently leading development of NOVA, an AI system integrating Claude and ChatGPT APIs, RAG pipelines, OCR, and vector databases to generate automated proposals and analyze architectural documents. <br />
+            </p>
+          </div>
+
+          <div>
+        </div>
+
+        <!-- EDUCATION -->
+        <div class="border-t ink-rule my-8"></div>
+        <h3 class="uppercase h1-condensed text-xl tracking-[0.16em] opacity-80">Education</h3>
+        <div class="space-y-6">
+        <div>
+            <div class="flex justify-between items-center">
+            <span class="font-semibold">University of New Mexico — Albuquerque, NM</span>
+            <span class="text-xs opacity-70">Aug 2022 - Dec 2025</span>
+            </div>
+            <div class="eyebrow mt-1">BBA in Management Information Systems & Human Resources | GPA: 3.8</div>
+            <p class="mt-2 opacity-85 text-sm md:text-base">
+            Notable Coursework: Computer-Based Information Systems, Business Application Programming, Information Systems Development
+            </p>
+        </div>
+
+        <div>
+            <div class="flex justify-between items-center">
+            <span class="font-semibold">Vrije Universiteit Amsterdam — Amsterdam, NL</span>
+            <span class="text-xs opacity-70">Feb 2024 - Aug 2024</span>
+            </div>
+            <div class="eyebrow mt-1">Study Abroad | GA: 7.9/10</div>
+            <p class="mt-2 opacity-85 text-sm md:text-base">
+            Notable Coursework: Cross-Cultural Marketing, Literature & Globalization, Modern Philosophy
+            </p>
+        </div>
+
+        <div>
+            <div class="flex justify-between items-center">
+            <span class="font-semibold">Central New Mexico Community College — Albuquerque, NM</span>
+            <span class="text-xs opacity-70">Aug 2020 - May 2022</span>
+            </div>
+            <div class="eyebrow mt-1">Associate of Arts in Psychology | GPA: 3.9</div>
+            <p class="mt-2 opacity-85 text-sm md:text-base">
+            </p>
+        </div>
+        </div>
+
+
+        <!-- SKILLS -->
+        <div class="border-t ink-rule my-8"></div>
+        <h3 class="uppercase h1-condensed text-xl tracking-[0.16em] opacity-80">Core Skills</h3>
+        <ul class="grid md:grid-cols-3 gap-4 text-sm opacity-90">
+          <li><strong>Programming:</strong> Python, JavaScript/TypeScript, SQL, HTML/CSS</li>
+          <li><strong>Frameworks:</strong> Flask, React, Astro, Tailwind</li>
+          <li><strong>AI Tools:</strong> OpenAI, Anthropic, Sentence-Transformers, FAISS</li>
+          <li><strong>Databases:</strong> PostgreSQL, MariaDB, MongoDB</li>
+          <li><strong>Data Tools:</strong> Pandas, Excel, Power BI</li>
+          <li><strong>Creative:</strong> UX design, branding, automation strategy</li>
+        </ul>
+
+        <!-- CERTS -->
+        <div class="border-t ink-rule my-8"></div>
+        <div class="grid md:grid-cols-2 gap-8 text-sm opacity-90">
+          <div>
+            <h3 class="uppercase h1-condensed text-xl tracking-[0.16em] opacity-80 mb-2">Certifications</h3>
+            <ul class="space-y-1">
+              <li>Cybersecurity for Everyone (Department of Homeland Security)</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- DOWNLOAD LINK -->
+        <div class="border-t ink-rule my-10"></div>
+        <div class="text-center pb-10">
+          <a
+            href="/files/OrianaOlmsteadCV.pdf"
+            download
+            class="btn-red border ink-border hover:bg-[var(--color-brand)] hover:text-[var(--color-bg)] transition-colors duration-300"
+          >
+            Download Full CV <span class="chev">↓</span>
+          </a>
+        </div>
+      </section>
+</Base>

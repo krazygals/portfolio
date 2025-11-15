@@ -1,0 +1,224 @@
+---
+// src/components/ProjectGrid.astro
+
+import PDFViewer from "./PDFViewer.astro";
+import type { Project } from "../data/projects";
+import { projects } from "../data/projects";
+
+export interface Props {
+  variant?: "full" | "title";
+  category?: "work" | "school" | "all";
+}
+
+const { variant = "full", category = "all" } = Astro.props;
+
+// still used for the simple title-only variant (e.g., home red band)
+const filtered: Project[] = projects.filter(
+  (p) => category === "all" || p.category === category
+);
+
+// Detailed list used for the FULL variant with dropdowns
+type DetailedProject = {
+  id: string;
+  title: string;
+  href?: string;
+  year?: string;
+  role?: string;
+  note?: string;        // short tech stack / tagline
+  description?: string; // short summary (for collapsed card)
+  desc?: string;        // long description (for expanded content)
+  pdf?: string;
+};
+
+const detailed: DetailedProject[] = [
+  {
+      id: "#0001",
+      title: "Nova — Neural Optical Vector Assistant",
+      note: "FastAPI + React + PostgreSQL • Multi-LLM Retrieval • Internal Research Platform",
+      description:
+        "Full-stack AI document intelligence system that transforms facility-planning archives into a searchable, conversational knowledge base using OCR, vector embeddings, and multi-LLM orchestration.",
+      desc: `Nova (Neural Optical Vector Assistant) is a full-stack AI research and retrieval platform I designed and built independently for internal use at my firm. 
+    The system automates OCR extraction, text segmentation, and embedding generation to convert thousands of PDFs and scanned reports into a searchable vector database. 
+    Its backend—built with FastAPI, PostgreSQL + pgvector, and FAISS—powers high-dimensional semantic retrieval using cosine similarity and context-weighted ranking. 
+    A React + Tailwind frontend provides secure login, session-based chat, and an admin dashboard for review and feedback. 
+    Nova’s multi-LLM query engine routes context between OpenAI GPT-4o and Anthropic Claude 3.5, delivering accurate, fluent responses grounded in institutional data. 
+    Currently deployed on an internal Debian VPS, Nova enables planners, evaluators, and editors to interact conversationally with decades of facility-planning documents—turning static archives into living, queryable knowledge systems.`,
+      viewer: {
+        label: "Confidential Internal Project",
+        url: "#", // keep as placeholder; no live link for security
+      },
+    },
+
+    {
+    id: "#0002",
+    title: "Xcellent — AI-Powered Excel → Database Mapper",
+    note: "React + Flask + PostgreSQL • AI Column Matching • Full-Stack Automation",
+    description:
+      "Full-stack web app that uses AI to match Excel columns to database schemas, automating data cleaning and reformatting for analysts working with inconsistent datasets.",
+    desc: `Xcellent is a full-stack web application I designed and built independently for my senior capstone project, inspired by workflow inefficiencies I encountered in my data analyst role. 
+  The platform automates the process of aligning messy Excel data with database schemas through AI-driven column matching. 
+  Using an ensemble of Sentence Transformers, FAISS, Levenshtein, and Jaccard similarity, Xcellent intelligently maps semantically similar fields (e.g., 'rm_no' → 'room') and exports results in SQL-ready formats. 
+  The backend—built with Flask, Pandas, and PostgreSQL—handles data parsing, schema detection, and ETL operations, while the React.js frontend with Material UI and a Hyperspace-inspired dark theme offers intuitive file upload, schema input, and export interfaces. 
+  Future development includes expanding multi-file merging functionality beyond two datasets and integrating user accounts for saved sessions. 
+  This project demonstrates advanced AI integration, secure full-stack architecture, and workflow automation designed to streamline data transformation tasks for analysts and organizations.`,
+     viewer: {
+        label: "Live Demo",
+        url: "https://xcellentupload.com",
+     },
+  },
+
+{
+  id: "#0003",
+  title: "SQL-Based Utilization & Capacity Analysis Example",
+  note: "MariaDB + Automation • Internal Web App Integration • Process Innovation",
+  description:
+    "Standardized district utilization and capacity workflows by merging school schedules and room data into a unified SQL-driven system, introducing automated categorization and reducing manual data entry time by over 50%.",
+  desc: `Developed an internal system to standardize the utilization and capacity analysis process by consolidating individual school data into a master schedule and room database for each district. 
+Once all required fields were completed, data was converted to CSV and uploaded into the firm’s MariaDB-backed web app. 
+To further improve efficiency, I enhanced the facility assessment database—automating space categorization and square footage allocation directly from room contents, eliminating the need for manual entry. 
+These improvements cut evaluator billing hours for utilization and capacity studies by more than half while strengthening data consistency and analytical accuracy across projects.`,
+    pdf: "/assets/SQL-Utilization-and-Capacity-Example.pdf",
+},
+  {
+    id: "#0004",
+    title: "Excel-Based Utilization & Capacity Analysis Example",
+    note: "10+ projects • NMPED & PSFA standards • Excel & Adobe Illustrator",
+    description:
+      "District-wide utilization and capacity analysis aligning with NMPED and PSFA standards, delivering multi-year projections and data-driven visual reports for facility planning.",
+    desc: `District-wide capacity, utilization, and classroom need analysis integrating NMPED and PSFA guidelines.
+Led client comms, coordinated field data capture, and translated schedules into Maximum, Functional, and Program Capacity with 5–10 year projections.
+These projects often exceed 80 pages of visualizations that inform long-term facility master plans and funding decisions.`,
+    // make sure this file is in /public/assets/
+    pdf: "/assets/FMS-FMP-2022-Portfolio-Version.pdf",
+  },
+];
+---
+
+{variant === "title" ? (
+  /* SIMPLE TITLE-ONLY LIST (for the red band on home) */
+  <div class="space-y-2">
+    {filtered.map((p) => (
+      <article class="group">
+        <h3 class="h1-condensed text-base md:text-lg uppercase tracking-wide">
+          {p.href ? (
+            <a href={p.href} class="no-underline hover:underline">
+              {p.title}
+            </a>
+          ) : (
+            p.title
+          )}
+        </h3>
+      </article>
+    ))}
+  </div>
+) : (
+  /* FULL GRID: each card is clickable and expands inline with details + PDF */
+<section class="w-full space-y-4 pb-24 md:pb-32 mb-20 md:mb-28">
+    {detailed.map((p) => (
+      <details class="box group" data-react>
+        {/* CARD HEADER (clickable) */}
+        <summary class="cursor-pointer list-none">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="opacity-60 text-xs md:text-sm">
+                  {p.id}
+                </span>
+                <h3 class="h1-condensed text-base md:text-lg uppercase tracking-wide">
+                  {p.href ? (
+                    <a href={p.href} class="no-underline hover:underline">
+                      {p.title}
+                    </a>
+                  ) : (
+                    p.title
+                  )}
+                </h3>
+              </div>
+
+              {p.note && (
+                <p class="mt-1 text-xs md:text-sm opacity-70">
+                  {p.note}
+                </p>
+              )}
+
+              {p.description && (
+                <p class="mt-2 opacity-85 text-sm md:text-base">
+                  {p.description}
+                </p>
+              )}
+
+              <p class="mt-2 text-[11px] md:text-xs uppercase tracking-[0.16em] opacity-60">
+                Click to view details
+              </p>
+            </div>
+          </div>
+        </summary>
+
+        {/* EXPANDED CONTENT (accordion-style) */}
+        <div class="accordion-content mt-4 pt-4 border-t ink-rule">
+          {p.role && <div class="eyebrow mb-2">{p.role}</div>}
+
+          {p.desc && (
+            <p class="opacity-85 text-sm md:text-base leading-relaxed whitespace-pre-line">
+              {p.desc}
+            </p>
+          )}
+
+            {p.pdf && (
+              <div class="mt-4 pdf-wrap">
+                <PDFViewer pdf={p.pdf} title={p.title} height={520} />
+              </div>
+            )}
+
+
+          {p.viewer && (
+            <div class="mt-4">
+              <a
+                href={p.viewer.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-block border ink-rule text-[var(--color-brand)] font-semibold py-2 px-5 rounded-none bg-transparent hover:bg-transparent transition-colors duration-200"
+              >
+                {p.viewer.label}
+              </a>
+            </div>
+          )}
+
+
+        </div>
+      </details>
+    ))}
+  </section>
+)}
+
+<style is:global>
+  /* hide default triangle on details/summary */
+  details > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  /* shadcn-inspired accordion animation */
+  details .accordion-content {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transform-origin: top;
+    transform: translateY(-4px);
+    transition:
+      max-height 0.25s ease-out,
+      opacity 0.25s ease-out,
+      transform 0.25s ease-out;
+  }
+
+  details[open] .accordion-content {
+    max-height: 1200px; /* large enough to fit PDF + text */
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+    /* only remove the inherited fill on this specific link type inside .box */
+  .box a.no-fill {
+    background: transparent !important;   /* clears any background or gradient */
+  }
+
+</style>

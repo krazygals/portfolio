@@ -1,0 +1,42 @@
+---
+import Base from "../layouts/Base.astro";
+import Hero from "../components/Hero.astro";
+import LetterGlitch from "../components/LetterGlitch";
+
+const eyebrow = "Analytics + AI Pipelines + Full-Stack Apps";
+const title = "AI + DATA SYSTEMS STRATEGIST";
+const location = "Building systems that think so people can breathe.";
+---
+
+<Base title="Home">
+  <div class="full-bleed">
+    <Hero {eyebrow} {title} {location} />
+  </div>
+
+<!-- ABOUT BAND UNDER HERO -->
+  <section class="full-bleed py-10 md:py-14 px-6 md:px-12 lg:px-20">
+    <div class="max-w-3xl mx-auto">
+    <p class="opacity-85 text-sm md:text-base leading-relaxed">
+      I collaborate with architects, analysts, and developers to design data systems that blend technical accuracy with visual clarity. 
+      I started with Excel automations and database scripting, then moved into full-stack development with Flask, React, and PostgreSQL. 
+      Now, I build AI-powered tools that use Tesseract OCR, FAISS embeddings, and RAG frameworks to surface meaningful insights from unstructured data. </b >
+      My work bridges front-end interfaces and back-end intelligence, creating automation pipelines, dashboards, and analysis tools that feel intuitive, scalable, and grounded in real-world application.
+    </p>
+    </div>
+
+<!-- GLITCH BACKGROUND BAND -->
+<section class="full-bleed py-10 md:py-14 px-6 md:px-12 lg:px-20">
+<div class="overflow-hidden h-48 md:h-64 lg:h-72">
+    <LetterGlitch
+      client:load
+      glitchColors={["#5e4491", "#A476FF", "#241a38"]}
+      glitchSpeed={33}
+      centerVignette={false}
+      outerVignette={false}
+      smooth={true}
+    />
+  </div>
+</section>
+
+  </section>
+</Base>
